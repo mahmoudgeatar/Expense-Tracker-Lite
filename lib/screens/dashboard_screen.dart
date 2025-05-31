@@ -17,6 +17,7 @@ import 'package:provider/provider.dart';
 
 import 'add_expense_screen.dart';
 import '../models/expense_model.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 enum DateFilter { last7Days, currentMonth }
 
@@ -28,7 +29,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int currentPage = 0;
   final scrollController = ScrollController();
 
   DateFilterType selectedFilter = DateFilterType.last7Days;
@@ -37,32 +37,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     final provider = Provider.of<ExpenseProvider>(context, listen: false);
-    provider.loadExpenses(page: currentPage, filter: selectedFilter,);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      provider.loadExpenses(
+        filter: selectedFilter,
+      );
+    });
+
     scrollController.addListener(() {
-      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent && !provider.isLoading) {
-        currentPage++;
+      if (scrollController.position.pixels >=
+              scrollController.position.maxScrollExtent &&
+          !provider.isLoading) {
+        provider.currentPage++;
         provider.loadExpenses(
-          page: currentPage,
           filter: selectedFilter,
         );
       }
     });
-  }
-
-  double getTotalExpenses(List<Expense> expenses) {
-    return expenses.fold(0.0, (sum, e) => sum + e.amount);
-  }
-
-  void _onFilterChanged(DateFilterType? filter) {
-    if (filter == null) return;
-    setState(() {
-      selectedFilter = filter;
-      currentPage = 0;
-    });
-    Provider.of<ExpenseProvider>(context, listen: false).loadExpenses(
-      page: 0,
-      filter: selectedFilter,
-    );
   }
 
   @override
@@ -74,13 +64,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ExpenseProvider>(context);
-    final expenses = provider.expenses.reversed.toList();
-    final totalExpenses = getTotalExpenses(expenses);
+    final expenses = provider.expenses;
+    final totalExpenses = provider.getTotalExpenses(expenses);
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-          currentPage = 0;
-          await provider.loadExpenses(page: 0, filter: selectedFilter);
+          provider.currentPage = 0;
+          await provider.loadExpenses(filter: selectedFilter);
         },
         child: Stack(
           children: [
@@ -135,7 +125,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: DropdownButton<DateFilterType>(
                             value: selectedFilter,
-                            onChanged: _onFilterChanged,
+                            onChanged: provider.onFilterChanged,
                             underline: const SizedBox(),
                             items: const [
                               DropdownMenuItem(
@@ -168,8 +158,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             if (index == expenses.length) {
                               return const Loadingwidget();
                             }
-                            return ExpensesCardWidget(
-                              expense: expenses[index],
+                            return AnimationConfiguration.staggeredList(
+                              position: index,
+                              duration: const Duration(seconds: 1),
+                              child: SlideAnimation(
+                                verticalOffset: 50.0,
+                                child: FadeInAnimation(
+                                  child: ExpensesCardWidget(
+                                    expense: expenses[index],
+                                  ),
+                                ),
+                              ),
                             );
                           },
                         ),

@@ -46,6 +46,7 @@ dependencies:
   intl:
   mocktail:
   build_runner:
+  flutter_staggered_animations:
 dev_dependencies:
   flutter_test:
     sdk: flutter

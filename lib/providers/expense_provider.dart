@@ -10,24 +10,23 @@ enum DateFilterType { last7Days, currentMonth }
 class ExpenseProvider with ChangeNotifier {
   List<Expense> _expenses = [];
   bool isLoading = false;
+  int currentPage = 0;
 
   DateFilterType selectedFilter = DateFilterType.last7Days;
 
-
   List<Expense> get expenses => _expenses;
 
-
   Future<void> loadExpenses(
-      {int page = 0, DateFilterType? filter = DateFilterType.last7Days}) async {
+      {DateFilterType? filter = DateFilterType.last7Days}) async {
     isLoading = true;
     notifyListeners();
 
     final newExpenses = await ExpenseDatabase.instance.getAllExpenses(
-      offset: page * 10,
+      offset: currentPage * 10,
       limit: 10,
       filter: filter,
     );
-    if (page == 0) {
+    if (currentPage == 0) {
       _expenses = newExpenses;
     } else {
       _expenses.addAll(newExpenses);
@@ -37,6 +36,19 @@ class ExpenseProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  double getTotalExpenses(List<Expense> expenses) {
+    return expenses.fold(0.0, (sum, e) => sum + e.amount);
+  }
 
+  void onFilterChanged(DateFilterType? filter) {
+    if (filter == null) return;
 
+    selectedFilter = filter;
+    currentPage = 0;
+
+    loadExpenses(
+      filter: selectedFilter,
+    );
+    notifyListeners();
+  }
 }
