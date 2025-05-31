@@ -67,6 +67,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final expenses = provider.expenses;
     final totalExpenses = provider.getTotalExpenses(expenses);
     return Scaffold(
+      backgroundColor: ColorManager.white,
       body: RefreshIndicator(
         onRefresh: () async {
           provider.currentPage = 0;
