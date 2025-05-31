@@ -1,30 +1,64 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:expense_tracker_lite/providers/add_expense_provider.dart';
+import 'package:expense_tracker_lite/screens/add_expense_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:expense_tracker_lite/main.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:expense_tracker_lite/providers/add_expense_provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Validate amount, category, and date fields on Save tap', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider<AddExpenseProvider>(
+          create: (_) => AddExpenseProvider(),
+          child: const AddExpenseScreen(),
+        ),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    final saveButton = find.text('Save');
+    expect(saveButton, findsOneWidget);
+    await tester.tap(saveButton);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Enter amount'), findsOneWidget);
+
+    expect(find.text('Choose Date'), findsOneWidget);
+
   });
+
+
+
+
+
+
+    group('AddExpenseProvider.convertExpense', () {
+      late AddExpenseProvider provider;
+      setUp(() {
+        provider = AddExpenseProvider();
+      });
+
+      test('should not convert amount if currency is USD', () {
+        provider.selectedCurrency = {'code': 'USD', 'rate': 1.0};
+        provider.amountController.text = '100';
+
+        provider.convertExpense();
+
+        expect(provider.convertedAmount, '100');
+      });
+
+      test('should convert amount correctly if currency is not USD', () {
+        provider.selectedCurrency = {'code': 'EUR', 'rate': 0.85};
+        provider.amountController.text = '85';
+
+        provider.convertExpense();
+
+        // 85 / 0.85 = 100
+        expect(double.parse(provider.convertedAmount!), closeTo(100, 0.001));
+      });
+    });
+
+
 }

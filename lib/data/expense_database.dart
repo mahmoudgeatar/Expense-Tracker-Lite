@@ -4,6 +4,10 @@ import 'package:sqflite/sqflite.dart';
 import '../models/expense_model.dart';
 
 class ExpenseDatabase {
+
+
+
+
   static final ExpenseDatabase instance = ExpenseDatabase._init();
   static Database? _database;
 

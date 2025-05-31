@@ -28,8 +28,10 @@ class ExpenseProvider with ChangeNotifier {
     );
     if (currentPage == 0) {
       _expenses = newExpenses;
+      notifyListeners();
     } else {
       _expenses.addAll(newExpenses);
+      notifyListeners();
     }
 
     isLoading = false;

@@ -45,8 +45,10 @@ dependencies:
   font_awesome_flutter:
   intl:
   mocktail:
+  mockito:
   build_runner:
   flutter_staggered_animations:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
