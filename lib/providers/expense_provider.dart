@@ -1,6 +1,11 @@
 // lib/providers/expense_provider.dart
+import 'dart:io';
+
+import 'package:csv/csv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../data/expense_database.dart';
 import '../models/expense_model.dart';
@@ -52,5 +57,16 @@ class ExpenseProvider with ChangeNotifier {
       filter: selectedFilter,
     );
     notifyListeners();
+  }
+
+
+  Future<String> exportCSV(List<List<dynamic>> data) async {
+    String csvData = const ListToCsvConverter().convert(data);
+    final directory = await getApplicationDocumentsDirectory();
+    final path = '${directory.path}/exported_data.csv';
+    final file = File(path);
+    await file.writeAsString(csvData);
+    await OpenFile.open(path,isIOSAppOpen: true,);
+    return path;
   }
 }

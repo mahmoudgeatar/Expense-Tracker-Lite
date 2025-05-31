@@ -1,22 +1,19 @@
 // lib/presentation/screens/dashboard_screen.dart
+
 import 'package:expense_tracker_lite/constants/color_manger.dart';
-import 'package:expense_tracker_lite/providers/add_expense_provider.dart';
 import 'package:expense_tracker_lite/providers/expense_provider.dart';
 import 'package:expense_tracker_lite/screens/widgets/LoaderWidget.dart';
 import 'package:expense_tracker_lite/screens/widgets/balance_card_widget.dart';
 import 'package:expense_tracker_lite/screens/widgets/expenses_card_widget.dart';
 import 'package:expense_tracker_lite/screens/widgets/floating_action_button_widget.dart';
 import 'package:expense_tracker_lite/screens/widgets/section_header_widget.dart';
-import 'package:expense_tracker_lite/screens/widgets/total_balance_widget.dart';
-import 'package:expense_tracker_lite/utils/helper.dart';
+
 import 'package:expense_tracker_lite/widgets/my_text.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
+
 import 'package:provider/provider.dart';
 
-import 'add_expense_screen.dart';
-import '../models/expense_model.dart';
+
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 enum DateFilter { last7Days, currentMonth }
@@ -165,8 +162,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: SlideAnimation(
                                 verticalOffset: 50.0,
                                 child: FadeInAnimation(
-                                  child: ExpensesCardWidget(
-                                    expense: expenses[index],
+                                  child: InkWell(
+                                    onTap: ()async {
+                                      List<List<dynamic>> rows = [];
+                                      for (var expense in expenses) {
+                                        rows.add([
+                                          expense.id,
+                                          expense.category,
+                                          expense.amount,
+                                          expense.date,
+                                          expense.currency,
+                                        ]);
+                                      }
+                                    await provider.exportCSV(rows);
+                                    },
+                                    child: ExpensesCardWidget(
+                                      expense: expenses[index],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -182,4 +194,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       floatingActionButton: const FloatingActionButtonWidget(),
     );
   }
+
+
+
 }

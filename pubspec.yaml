@@ -48,6 +48,9 @@ dependencies:
   mockito:
   build_runner:
   flutter_staggered_animations:
+  csv:
+  permission_handler:
+  open_file:
 
 dev_dependencies:
   flutter_test:

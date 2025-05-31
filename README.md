@@ -1,4 +1,6 @@
 # expense_tracker_lite
+ *Note you can log in with and letter in email field and password
+ *Note you can get cvs file when you click in expense item in the list the cvs file fof the list.
 
 1- Overview of the architecture and structure
 
@@ -46,7 +48,7 @@ When the user requests a new page, new data is fetched and appended to the exist
 
 6- Any trade-offs or assumptions
 
-I chose HTTP package for API calls because the requests are simple and don’t have complex constraints.
+I choose HTTP package for API calls because the requests are simple and don’t have complex constraints.
 
 I used Provider for state management due to the project's simplicity.
 
@@ -56,6 +58,4 @@ Usually, I use Generic BLoC, dio, and Repository patterns for handling requests 
 
 use any flutterSdk version android stadio and run it in ios or android semulators
 
-8- Any known bugs or unimplemented features I complete every requird point and add animatios in navigation and expenses view
-
-6-
+8- Any known bugs or unimplemented features I complete every required point Bonus add export cvs file and  add animations in navigation and expenses view
